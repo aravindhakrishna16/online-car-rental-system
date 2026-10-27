@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - DriveEase Car Rental{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="brand-icon" style="margin: 0 auto 0.8rem; width: 44px; height: 44px; font-size: 1.3rem;">⚡</div>
+      <h2>Welcome Back</h2>
+      <p>Sign in to your DriveEase portal to manage your rentals</p>
+    </div>
+
+    <!-- Quick One-Click Sign In -->
+    <div class="demo-accounts-panel">
+      <div class="demo-title"><i class="fa-solid fa-bolt"></i> Quick Sign In Portals</div>
+      <div class="demo-btn-group">
+        <button type="button" class="demo-pill-btn" onclick="fillDemoLogin('arjun.renter@driveease.com', 'customer123')">
+          🚗 Customer
+        </button>
+        <button type="button" class="demo-pill-btn" onclick="fillDemoLogin('rahul.host@driveease.com', 'owner123')">
+          🔑 Car Owner
+        </button>
+        <button type="button" class="demo-pill-btn" onclick="fillDemoLogin('admin@driveease.com', 'admin123')">
+          🛡️ Admin
+        </button>
+      </div>
+    </div>
+
+    <form action="{{ url_for('auth.login') }}" method="POST">
+      <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+
+      <div class="form-group" style="margin-bottom: 1.1rem;">
+        <label>Email Address</label>
+        <div class="input-with-icon">
+          <i class="fa-solid fa-envelope icon"></i>
+          <input type="email" name="email" id="loginEmail" class="form-control" value="{{ email or '' }}" placeholder="name@domain.com" required>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label>Password</label>
+        <div class="input-with-icon">
+          <i class="fa-solid fa-lock icon"></i>
+          <input type="password" name="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-accent btn-block" style="padding: 0.9rem; font-size: 1rem;">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Account
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.75rem; font-size: 0.9rem; color: #6B7280;">
+      Don't have an account yet? 
+      <a href="{{ url_for('auth.register') }}" style="color: var(--primary-dark); font-weight: 800; text-decoration: underline;">
+        Create Account
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

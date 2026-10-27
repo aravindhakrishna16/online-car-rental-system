@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Vehicle Listings - Admin Console{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar" style="background: var(--accent-yellow); color: var(--primary-dark);">A</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="background: #EDE9FE; color: #7C3AED; font-size: 0.65rem;">Platform Admin</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
+      <li><a href="{{ url_for('admin.verify_cars') }}" class="sidebar-link active"><i class="fa-solid fa-shield-halved"></i> Verify Cars</a></li>
+      <li><a href="{{ url_for('admin.manage_users') }}" class="sidebar-link"><i class="fa-solid fa-users"></i> Users Directory</a></li>
+      <li><a href="{{ url_for('admin.all_bookings') }}" class="sidebar-link"><i class="fa-solid fa-calendar-days"></i> All Bookings</a></li>
+      <li><a href="{{ url_for('admin.payments') }}" class="sidebar-link"><i class="fa-solid fa-receipt"></i> Payment Records</a></li>
+      <li><a href="{{ url_for('admin.reviews') }}" class="sidebar-link"><i class="fa-solid fa-star"></i> Review Moderation</a></li>
+      <li><a href="{{ url_for('admin.reports') }}" class="sidebar-link"><i class="fa-solid fa-file-chart-column"></i> System Reports</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>Vehicle Listings Verification Queue</h1>
+        <p>Review vehicle registrations and uploaded documents before approving for public catalog.</p>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <a href="{{ url_for('admin.verify_cars', status='pending') }}" class="filter-tab-btn {% if current_status == 'pending' %}active{% endif %}">Pending Verification</a>
+      <a href="{{ url_for('admin.verify_cars', status='approved') }}" class="filter-tab-btn {% if current_status == 'approved' %}active{% endif %}">Approved Cars</a>
+      <a href="{{ url_for('admin.verify_cars', status='rejected') }}" class="filter-tab-btn {% if current_status == 'rejected' %}active{% endif %}">Rejected Cars</a>
+      <a href="{{ url_for('admin.verify_cars', status='all') }}" class="filter-tab-btn {% if current_status == 'all' %}active{% endif %}">All Listings</a>
+    </div>
+
+    <div class="dashboard-card">
+      {% if cars %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Vehicle & Registration</th>
+                <th>Host Details</th>
+                <th>Category & Rate</th>
+                <th>RC Document</th>
+                <th>Status</th>
+                <th>Verification Decision</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for car in cars %}
+                <tr>
+                  <td>
+                    <div class="table-car-cell">
+                      <img src="{{ car.image_url }}" alt="{{ car.name }}" class="table-car-thumb" onerror="this.src='/static/images/default_car.jpg'">
+                      <div class="table-car-info">
+                        <span class="table-car-title">{{ car.name }} ({{ car.year }})</span>
+                        <span class="table-car-sub" style="font-family: monospace; font-weight: 700;">{{ car.registration_number }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 700;">{{ car.owner_name }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ car.owner_email }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">📞 {{ car.owner_phone }}</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 700;">{{ car.category }} &bull; {{ car.fuel_type }}</div>
+                    <div style="font-size: 0.8rem; color: var(--primary-dark); font-weight: 800;">{{ currency }}{{ "{:,.0f}".format(car.price_per_day) }}/day</div>
+                  </td>
+                  <td>
+                    <a href="/static/images/sample_rc.png" target="_blank" class="btn btn-outline btn-sm" style="font-size: 0.75rem;">
+                      <i class="fa-solid fa-file-image"></i> View RC Copy
+                    </a>
+                  </td>
+                  <td>
+                    {% if car.approval_status == 'approved' %}
+                      <span class="role-tag badge-success">Approved</span>
+                    {% elif car.approval_status == 'pending' %}
+                      <span class="role-tag badge-warning">Pending</span>
+                    {% else %}
+                      <span class="role-tag badge-danger">Rejected</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                      {% if car.approval_status != 'approved' %}
+                        <form action="{{ url_for('admin.approve_car', car_id=car.id) }}" method="POST">
+                          <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fa-solid fa-check"></i> Approve
+                          </button>
+                        </form>
+                      {% endif %}
+                      {% if car.approval_status != 'rejected' %}
+                        <form action="{{ url_for('admin.reject_car', car_id=car.id) }}" method="POST" onsubmit="return confirm('Reject listing for {{ car.name }}?');">
+                          <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fa-solid fa-xmark"></i> Reject
+                          </button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: #6B7280; font-style: italic; padding: 2rem 0; text-align: center;">No vehicle listings matching this verification filter.</p>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

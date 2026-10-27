@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Register - DriveEase Car Rental{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card" style="max-width: 540px;">
+    <div class="auth-header">
+      <div class="brand-icon" style="margin: 0 auto 0.8rem; width: 44px; height: 44px; font-size: 1.3rem;">⚡</div>
+      <h2>Create Your Account</h2>
+      <p>Join the next-generation car rental community</p>
+    </div>
+
+    <form action="{{ url_for('auth.register') }}" method="POST">
+      <!-- Role Selection Segmented Control -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">Select Your Role</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; background: #F1F5F9; padding: 0.35rem; border-radius: var(--radius-sm);">
+          <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.88rem; font-weight: 800; text-align: center; background: #FFFFFF; box-shadow: var(--shadow-sm);" id="roleCustLabel">
+            <input type="radio" name="role" value="customer" checked style="display: none;" onchange="updateRoleHighlight(this)">
+            <span>🚗 Customer (Renter)</span>
+          </label>
+          <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.88rem; font-weight: 800; text-align: center; color: #64748B;" id="roleOwnerLabel">
+            <input type="radio" name="role" value="owner" style="display: none;" onchange="updateRoleHighlight(this)">
+            <span>🔑 Car Owner (Host)</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.1rem;">
+        <div class="form-group">
+          <label>Full Name</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-user icon"></i>
+            <input type="text" name="name" class="form-control" placeholder="Rohan Sharma" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-phone icon"></i>
+            <input type="tel" name="phone" class="form-control" placeholder="9876543210" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.1rem;">
+        <label>Email Address</label>
+        <div class="input-with-icon">
+          <i class="fa-solid fa-envelope icon"></i>
+          <input type="email" name="email" class="form-control" placeholder="rohan@example.com" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.1rem;">
+        <div class="form-group">
+          <label>Driving License No.</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-id-card icon"></i>
+            <input type="text" name="license_number" class="form-control" placeholder="DL-1420110012345">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>City / Address</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-location-dot icon"></i>
+            <input type="text" name="address" class="form-control" placeholder="Bangalore, Karnataka">
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-lock icon"></i>
+            <input type="password" name="password" class="form-control" placeholder="Min 6 chars" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-lock icon"></i>
+            <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" required>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-accent btn-block" style="padding: 0.9rem; font-size: 1rem;">
+        <i class="fa-solid fa-user-plus"></i> Register Account
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.75rem; font-size: 0.9rem; color: #6B7280;">
+      Already have an account? 
+      <a href="{{ url_for('auth.login') }}" style="color: var(--primary-dark); font-weight: 800; text-decoration: underline;">
+        Sign In
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateRoleHighlight(radio) {
+  const custLabel = document.getElementById('roleCustLabel');
+  const ownerLabel = document.getElementById('roleOwnerLabel');
+  if (radio.value === 'customer') {
+    custLabel.style.background = '#FFFFFF';
+    custLabel.style.color = '#111827';
+    custLabel.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    ownerLabel.style.background = 'transparent';
+    ownerLabel.style.color = '#64748B';
+    ownerLabel.style.boxShadow = 'none';
+  } else {
+    ownerLabel.style.background = '#FFFFFF';
+    ownerLabel.style.color = '#111827';
+    ownerLabel.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    custLabel.style.background = 'transparent';
+    custLabel.style.color = '#64748B';
+    custLabel.style.boxShadow = 'none';
+  }
+}
+</script>
+{% endblock %}

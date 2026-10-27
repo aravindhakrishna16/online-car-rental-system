@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - DriveEase{% endblock %}
+
+{% block content %}
+<div class="section" style="text-align: center; padding: 6rem 1.5rem;">
+  <div style="font-size: 5rem; font-weight: 900; color: var(--accent-yellow); line-height: 1;">404</div>
+  <h1 style="font-size: 2.2rem; font-weight: 900; margin-top: 1rem;">Destination Not Found</h1>
+  <p style="color: #6B7280; font-size: 1.05rem; max-width: 500px; margin: 0.5rem auto 2rem;">
+    The page or vehicle you are trying to access might have been moved, delisted, or does not exist.
+  </p>
+  <a href="{{ url_for('public.index') }}" class="btn btn-accent" style="padding: 0.85rem 2rem;">
+    <i class="fa-solid fa-house"></i> Return to Home
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Available Rental Cars | DriveEase{% endblock %}
+
+{% block content %}
+<div style="background: var(--primary-dark); color: #FFFFFF; padding: 2.5rem 1.5rem; border-bottom: 1px solid var(--border-dark);">
+  <div style="max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 2.2rem; font-weight: 900; letter-spacing: -0.5px;">Explore Cars</h1>
+      <p style="color: #9CA3AF; margin-top: 0.2rem;">Choose from {{ cars|length }} verified self-drive cars available for your dates.</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <span class="role-tag" style="background: rgba(255,192,0,0.15); color: var(--accent-yellow); font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+        ⚡ Instant Booking Available
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="padding-top: 2rem;">
+  <div style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem; align-items: flex-start;">
+    
+    <!-- Filter Sidebar -->
+    <aside style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.5rem; box-shadow: var(--shadow-sm); position: sticky; top: 90px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light);">
+        <h3 style="font-size: 1.1rem; font-weight: 800;"><i class="fa-solid fa-sliders"></i> Filters</h3>
+        <a href="{{ url_for('public.cars') }}" style="font-size: 0.75rem; color: #2563EB; font-weight: 700;">Reset All</a>
+      </div>
+
+      <form action="{{ url_for('public.cars') }}" method="GET" style="display: flex; flex-direction: column; gap: 1.1rem;">
+        <!-- Location -->
+        <div class="form-group">
+          <label>Location</label>
+          <select name="location" class="form-control" style="padding-left: 0.85rem;">
+            <option value="">All Locations</option>
+            {% for loc in locations %}
+              <option value="{{ loc }}" {% if current_filters.location == loc %}selected{% endif %}>{{ loc }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category" class="form-control" style="padding-left: 0.85rem;">
+            <option value="all">All Categories</option>
+            {% for cat in ['Hatchback', 'Sedan', 'SUV', 'Luxury', 'Electric'] %}
+              <option value="{{ cat }}" {% if current_filters.category == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Fuel Type -->
+        <div class="form-group">
+          <label>Fuel Type</label>
+          <select name="fuel_type" class="form-control" style="padding-left: 0.85rem;">
+            <option value="all">Any Fuel</option>
+            {% for ft in ['Petrol', 'Diesel', 'Electric', 'Hybrid'] %}
+              <option value="{{ ft }}" {% if current_filters.fuel_type == ft %}selected{% endif %}>{{ ft }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Transmission -->
+        <div class="form-group">
+          <label>Transmission</label>
+          <select name="transmission" class="form-control" style="padding-left: 0.85rem;">
+            <option value="all">Any Transmission</option>
+            <option value="Manual" {% if current_filters.transmission == 'Manual' %}selected{% endif %}>Manual</option>
+            <option value="Automatic" {% if current_filters.transmission == 'Automatic' %}selected{% endif %}>Automatic</option>
+          </select>
+        </div>
+
+        <!-- Max Price -->
+        <div class="form-group">
+          <label>Max Price Per Day (₹)</label>
+          <input type="number" name="max_price" value="{{ current_filters.max_price }}" placeholder="e.g. 5000" class="form-control" style="padding-left: 0.85rem;">
+        </div>
+
+        <!-- Sort By -->
+        <div class="form-group">
+          <label>Sort By</label>
+          <select name="sort_by" class="form-control" style="padding-left: 0.85rem;">
+            <option value="popular" {% if current_filters.sort_by == 'popular' %}selected{% endif %}>Most Popular</option>
+            <option value="price_asc" {% if current_filters.sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_desc" {% if current_filters.sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+            <option value="rating" {% if current_filters.sort_by == 'rating' %}selected{% endif %}>Highest Rated</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 0.5rem;">
+          Apply Filters
+        </button>
+      </form>
+    </aside>
+
+    <!-- Cars Catalog Grid -->
+    <div>
+      {% if cars %}
+        <div class="cars-grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
+          {% for car in cars %}
+            <div class="car-card">
+              <div class="car-card-img-wrapper">
+                <img src="{{ car.image_url }}" alt="{{ car.name }}" class="car-card-img" onerror="this.src='/static/images/default_car.jpg'">
+                <span class="car-badge-category {{ car.get_badge_class() }}">{{ car.category }}</span>
+                <span class="car-badge-location"><i class="fa-solid fa-location-dot" style="color: #EF4444;"></i> {{ car.location }}</span>
+              </div>
+
+              <div class="car-card-body">
+                <div class="car-title-row">
+                  <div>
+                    <div class="car-card-name">{{ car.name }}</div>
+                    <div style="font-size: 0.8rem; color: #6B7280; font-weight: 600;">{{ car.brand }} &bull; {{ car.year }}</div>
+                  </div>
+                  <div class="car-rating-pill">
+                    <i class="fa-solid fa-star"></i> {{ car.avg_rating if car.avg_rating > 0 else '5.0' }}
+                  </div>
+                </div>
+
+                <div class="car-specs-row">
+                  <div class="spec-item"><i class="fa-solid fa-gas-pump"></i> {{ car.fuel_type }}</div>
+                  <div class="spec-item"><i class="fa-solid fa-gear"></i> {{ car.transmission }}</div>
+                  <div class="spec-item"><i class="fa-solid fa-user-group"></i> {{ car.seating_capacity }} Seats</div>
+                </div>
+
+                <div class="car-card-footer">
+                  <div class="car-price-box">
+                    <span class="rate">{{ currency }}{{ "{:,.0f}".format(car.price_per_day) }}</span>
+                    <span class="period">per day</span>
+                    <span class="period" style="display: block; font-size: 0.75rem; color: #F59E0B; font-weight: 700; margin-top: 2px;">
+                      + {{ currency }}{{ car.price_per_km | int }}/km
+                    </span>
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <a href="{{ url_for('public.car_details', car_id=car.id) }}" class="btn btn-outline-dark btn-sm">Details</a>
+                    <a href="{{ url_for('customer.book_car', car_id=car.id) }}" class="btn btn-accent btn-sm">Book</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="background: #FFFFFF; border: 1px dashed #CBD5E1; border-radius: var(--radius-md); padding: 4rem 2rem; text-align: center;">
+          <div style="font-size: 3rem; color: #9CA3AF; margin-bottom: 1rem;"><i class="fa-solid fa-car-side"></i></div>
+          <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary);">No Cars Found Matching Criteria</h3>
+          <p style="color: #6B7280; margin-top: 0.4rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+            Try clearing some filters or searching across all cities to discover more available rides.
+          </p>
+          <a href="{{ url_for('public.cars') }}" class="btn btn-accent" style="margin-top: 1.5rem;">
+            Clear All Filters
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

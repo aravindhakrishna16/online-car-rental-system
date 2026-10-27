@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Host Dashboard - DriveEase Car Owner Portal{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar" style="background: var(--primary-dark); color: var(--accent-yellow);">{{ current_user.name[:1] }}</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="background: #FEF3C7; color: #B45309; font-size: 0.65rem;">Car Owner / Host</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('owner.dashboard') }}" class="sidebar-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+      <li><a href="{{ url_for('owner.my_cars') }}" class="sidebar-link"><i class="fa-solid fa-car-side"></i> My Fleet ({{ cars|length }})</a></li>
+      <li><a href="{{ url_for('owner.add_car') }}" class="sidebar-link"><i class="fa-solid fa-circle-plus"></i> List New Car</a></li>
+      <li><a href="{{ url_for('auth.profile') }}" class="sidebar-link"><i class="fa-solid fa-user-pen"></i> Host Profile</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>Host Command Center</h1>
+        <p>Manage reservation requests, monitor fleet availability, and review earnings.</p>
+      </div>
+      <a href="{{ url_for('owner.add_car') }}" class="btn btn-accent btn-sm">
+        <i class="fa-solid fa-plus"></i> Add Vehicle to Fleet
+      </a>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fa-solid fa-car"></i></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ cars|length }}</div>
+          <div class="stat-label">Listed Vehicles</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ pending_bookings|length }}</div>
+          <div class="stat-label">Pending Requests</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-route"></i></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ confirmed_bookings|length }}</div>
+          <div class="stat-label">Active Rentals</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ currency }}{{ "{:,.0f}".format(earnings_stats.total_earnings) }}</div>
+          <div class="stat-label">Total Earnings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Requests Table -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <h3>Pending Booking Requests</h3>
+          {% if pending_bookings %}
+            <span class="role-tag badge-warning">{{ pending_bookings|length }} Action Required</span>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if pending_bookings %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Booking Ref</th>
+                <th>Renter Details</th>
+                <th>Vehicle</th>
+                <th>Trip Dates</th>
+                <th>Amount</th>
+                <th>Host Decision</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in pending_bookings %}
+                <tr>
+                  <td><strong style="font-family: monospace;">{{ b.booking_reference }}</strong></td>
+                  <td>
+                    <div style="font-weight: 800;">{{ b.customer_name }}</div>
+                    <div style="font-size: 0.78rem; color: #6B7280;">📞 {{ b.customer_phone }}</div>
+                  </td>
+                  <td>
+                    <div class="table-car-cell">
+                      <img src="{{ b.car_image }}" alt="{{ b.car_name }}" class="table-car-thumb" onerror="this.src='/static/images/default_car.jpg'">
+                      <div class="table-car-info">
+                        <span class="table-car-title">{{ b.car_name }}</span>
+                        <span class="table-car-sub">{{ b.car_registration }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div style="font-size: 0.85rem; font-weight: 700;">{{ b.start_date }} &rarr; {{ b.end_date }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ b.total_days }} day(s)</div>
+                  </td>
+                  <td><strong>{{ currency }}{{ "{:,.2f}".format(b.total_amount) }}</strong></td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <!-- Approve Button -->
+                      <form action="{{ url_for('owner.approve_booking', booking_id=b.id) }}" method="POST">
+                        <button type="submit" class="btn btn-success btn-sm">
+                          <i class="fa-solid fa-check"></i> Accept
+                        </button>
+                      </form>
+
+                      <!-- Reject Button -->
+                      <form action="{{ url_for('owner.reject_booking', booking_id=b.id) }}" method="POST" onsubmit="return confirm('Decline this booking request?');">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                          <i class="fa-solid fa-xmark"></i> Decline
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: #6B7280; font-style: italic; padding: 1rem 0;">No pending booking requests at this moment. You're all caught up!</p>
+      {% endif %}
+    </div>
+
+    <!-- Active Confirmed Rentals Table -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h3>Confirmed & In-Progress Rentals</h3>
+      </div>
+
+      {% if confirmed_bookings %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Booking Ref</th>
+                <th>Renter</th>
+                <th>Vehicle</th>
+                <th>Dates</th>
+                <th>Payment</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in confirmed_bookings %}
+                <tr>
+                  <td><span style="font-family: monospace; font-weight: 700;">{{ b.booking_reference }}</span></td>
+                  <td>
+                    <div style="font-weight: 700;">{{ b.customer_name }}</div>
+                    <div style="font-size: 0.78rem; color: #6B7280;">{{ b.customer_phone }}</div>
+                  </td>
+                  <td>{{ b.car_name }} ({{ b.car_registration }})</td>
+                  <td>{{ b.start_date }} to {{ b.end_date }}</td>
+                  <td>
+                    {% if b.payment_status == 'Completed' %}
+                      <span class="role-tag badge-success"><i class="fa-solid fa-check"></i> Paid</span>
+                    {% else %}
+                      <span class="role-tag badge-warning">Pending</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <form action="{{ url_for('owner.complete_booking', booking_id=b.id) }}" method="POST" onsubmit="return confirm('Confirm vehicle drop-off and mark rental completed?');">
+                      <button type="submit" class="btn btn-outline-dark btn-sm">
+                        <i class="fa-solid fa-flag-checkered"></i> Mark Trip Completed
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: #6B7280; font-style: italic; padding: 1rem 0;">No rentals currently active.</p>
+      {% endif %}
+    </div>
+
+    <!-- Customer Reviews on Host's Fleet -->
+    {% if reviews %}
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h3>Recent Customer Feedback on Your Cars</h3>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          {% for r in reviews %}
+            <div style="border-bottom: 1px solid #F1F5F9; padding-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div style="font-weight: 800; font-size: 0.95rem;">{{ r.customer_name }} on <span style="color: #2563EB;">{{ r.car_name }}</span></div>
+                <div style="color: #4B5563; font-size: 0.9rem; margin-top: 0.2rem;">"{{ r.comment }}"</div>
+                <div style="font-size: 0.75rem; color: #9CA3AF; margin-top: 0.3rem;">{{ r.created_at }}</div>
+              </div>
+              <div style="color: #F59E0B; font-size: 1rem;">
+                {{ "★" * r.rating + "☆" * (5 - r.rating) }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

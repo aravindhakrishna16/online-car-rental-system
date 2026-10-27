@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Payments & Revenue Ledger - Admin Console{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar" style="background: var(--accent-yellow); color: var(--primary-dark);">A</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="background: #EDE9FE; color: #7C3AED; font-size: 0.65rem;">Platform Admin</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
+      <li><a href="{{ url_for('admin.verify_cars') }}" class="sidebar-link"><i class="fa-solid fa-shield-halved"></i> Verify Cars</a></li>
+      <li><a href="{{ url_for('admin.manage_users') }}" class="sidebar-link"><i class="fa-solid fa-users"></i> Users Directory</a></li>
+      <li><a href="{{ url_for('admin.all_bookings') }}" class="sidebar-link"><i class="fa-solid fa-calendar-days"></i> All Bookings</a></li>
+      <li><a href="{{ url_for('admin.payments') }}" class="sidebar-link active"><i class="fa-solid fa-receipt"></i> Payment Records</a></li>
+      <li><a href="{{ url_for('admin.reviews') }}" class="sidebar-link"><i class="fa-solid fa-star"></i> Review Moderation</a></li>
+      <li><a href="{{ url_for('admin.reports') }}" class="sidebar-link"><i class="fa-solid fa-file-chart-column"></i> System Reports</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>Payment Ledger & Revenue</h1>
+        <p>Complete historical log of demo UPI, card, and cash transactions.</p>
+      </div>
+      <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 0.85rem 1.4rem; text-align: right;">
+        <div style="font-size: 0.75rem; color: #065F46; font-weight: 700; text-transform: uppercase;">Total Processed Revenue</div>
+        <div style="font-size: 1.6rem; font-weight: 900; color: #065F46;">{{ currency }}{{ "{:,.2f}".format(total_revenue) }}</div>
+      </div>
+    </div>
+
+    <div class="dashboard-card">
+      {% if payments %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Transaction Ref</th>
+                <th>Booking Ref</th>
+                <th>Customer</th>
+                <th>Vehicle</th>
+                <th>Method</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Invoice</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in payments %}
+                <tr>
+                  <td><strong style="font-family: monospace;">{{ p.transaction_reference }}</strong></td>
+                  <td><span style="font-family: monospace;">{{ p.booking_reference }}</span></td>
+                  <td>
+                    <div style="font-weight: 700;">{{ p.customer_name }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ p.customer_email }}</div>
+                  </td>
+                  <td>{{ p.car_name }}</td>
+                  <td><span class="role-tag badge-secondary">{{ p.payment_method }}</span></td>
+                  <td><strong>{{ currency }}{{ "{:,.2f}".format(p.amount) }}</strong></td>
+                  <td style="font-size: 0.8rem; color: #6B7280;">{{ p.payment_date }}</td>
+                  <td><span class="role-tag badge-success">{{ p.payment_status }}</span></td>
+                  <td>
+                    <a href="{{ url_for('customer.view_invoice', txn_ref=p.transaction_reference) }}" class="btn btn-outline btn-sm" style="font-size: 0.75rem;">
+                      <i class="fa-solid fa-file-invoice"></i> View
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: #6B7280; font-style: italic; padding: 2rem 0; text-align: center;">No payment records found.</p>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

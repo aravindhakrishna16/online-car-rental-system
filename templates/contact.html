@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Contact & Support - DriveEase{% endblock %}
+
+{% block content %}
+<div class="section" style="max-width: 900px; padding-top: 2.5rem;">
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <span class="role-tag" style="background: #FEF3C7; color: #B45309; padding: 0.35rem 0.8rem;">24/7 SUPPORT</span>
+    <h1 style="font-size: 2.4rem; font-weight: 900; margin-top: 0.5rem; letter-spacing: -0.5px;">Get in Touch With Us</h1>
+    <p style="color: #6B7280; font-size: 1rem; margin-top: 0.3rem;">Have questions about booking, hosting, or our self-drive car rental platform? We're here to help.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem; align-items: flex-start;">
+    
+    <!-- Contact Form -->
+    <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 2rem; box-shadow: var(--shadow-sm);">
+      <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1.25rem;">Send a Message</h3>
+      <form action="{{ url_for('public.contact') }}" method="POST">
+        <div class="form-group" style="margin-bottom: 1.1rem;">
+          <label>Your Name</label>
+          <input type="text" name="name" class="form-control" style="padding-left: 0.85rem;" placeholder="e.g. Rahul Sharma" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.1rem;">
+          <label>Email Address</label>
+          <input type="email" name="email" class="form-control" style="padding-left: 0.85rem;" placeholder="name@domain.com" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.1rem;">
+          <label>Subject</label>
+          <input type="text" name="subject" class="form-control" style="padding-left: 0.85rem;" placeholder="e.g. Booking Enquiry or Host Signup" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label>Message</label>
+          <textarea name="message" rows="4" class="form-control" style="padding-left: 0.85rem;" placeholder="Type your query here..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-accent btn-block" style="padding: 0.85rem;">
+          <i class="fa-solid fa-paper-plane"></i> Send Message
+        </button>
+      </form>
+    </div>
+
+    <!-- Contact Details Card -->
+    <div>
+      <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1.25rem;">Headquarters</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 1.25rem; font-size: 0.9rem; color: #4B5563;">
+          <div style="display: flex; gap: 0.85rem; align-items: flex-start;">
+            <div style="width: 36px; height: 36px; background: #FEF3C7; color: #D97706; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-location-dot"></i></div>
+            <div>
+              <strong style="color: var(--primary-dark);">Address</strong><br>
+              DriveEase Mobility HQ, 4th Block, Koramangala, Bangalore, Karnataka - 560034
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.85rem; align-items: flex-start;">
+            <div style="width: 36px; height: 36px; background: #DBEAFE; color: #2563EB; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-phone"></i></div>
+            <div>
+              <strong style="color: var(--primary-dark);">Phone Support</strong><br>
+              +91 (080) 4123-9900 / 1800-DRIVE-EASE
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.85rem; align-items: flex-start;">
+            <div style="width: 36px; height: 36px; background: #D1FAE5; color: #059669; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-envelope"></i></div>
+            <div>
+              <strong style="color: var(--primary-dark);">Email Inquiries</strong><br>
+              support@driveease.com / rentals@driveease.com
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

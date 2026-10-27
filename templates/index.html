@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}DriveEase - Self-Drive Cars in Seconds | Online Car Rental{% endblock %}
+
+{% block content %}
+<!-- Hero Section (Uber / Rapido Style) -->
+<section class="hero-section">
+  <div class="hero-container">
+    <div>
+      <div class="hero-pill-badge">
+        <i class="fa-solid fa-bolt"></i> Instant Self-Drive Car Rentals
+      </div>
+      <h1 class="hero-title">
+        Rent your favorite car <span>in seconds.</span>
+      </h1>
+      <p class="hero-subtitle">
+        DriveEase connects trusted car owners with enthusiastic renters. Enjoy verified cars, transparent daily pricing, zero hidden charges, and unlimited memories.
+      </p>
+
+      <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <a href="{{ url_for('public.cars') }}" class="btn btn-accent" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
+          <i class="fa-solid fa-car-side"></i> Explore {{ stats.total_cars }}+ Cars
+        </a>
+        <a href="{{ url_for('auth.register', role='owner') }}" class="btn btn-outline" style="color: #FFFFFF; border-color: rgba(255,255,255,0.25); padding: 0.85rem 1.6rem;">
+          <i class="fa-solid fa-key"></i> Host Your Car & Earn
+        </a>
+      </div>
+
+      <div style="margin-top: 2.5rem; display: flex; gap: 2rem; border-top: 1px solid var(--border-dark); padding-top: 1.5rem;">
+        <div>
+          <div style="font-size: 1.6rem; font-weight: 900; color: #FFFFFF;">{{ stats.total_bookings }}+</div>
+          <div style="font-size: 0.8rem; color: #9CA3AF; text-transform: uppercase;">Trips Completed</div>
+        </div>
+        <div>
+          <div style="font-size: 1.6rem; font-weight: 900; color: var(--accent-yellow);">4.9★</div>
+          <div style="font-size: 0.8rem; color: #9CA3AF; text-transform: uppercase;">Renter Rating</div>
+        </div>
+        <div>
+          <div style="font-size: 1.6rem; font-weight: 900; color: #FFFFFF;">100%</div>
+          <div style="font-size: 0.8rem; color: #9CA3AF; text-transform: uppercase;">Verified Fleet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Search Widget Card -->
+    <div class="hero-search-card">
+      <div class="search-card-header">
+        <h3>Find Your Ride</h3>
+        <span class="search-badge">⚡ Instant Book</span>
+      </div>
+
+      <form action="{{ url_for('public.cars') }}" method="GET" class="search-form">
+        <div class="form-group">
+          <label>Pickup Location</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-location-dot icon"></i>
+            <select name="location" class="form-control">
+              <option value="">All Locations / Cities</option>
+              {% for loc in locations %}
+                <option value="{{ loc }}">{{ loc }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="search-grid-dates">
+          <div class="form-group">
+            <label>Pickup Date</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-calendar-days icon"></i>
+              <input type="date" name="start_date" id="bookingStartDate" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Return Date</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-calendar-check icon"></i>
+              <input type="date" name="end_date" id="bookingEndDate" class="form-control" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Car Type</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-car icon"></i>
+            <select name="category" class="form-control">
+              <option value="all">All Categories</option>
+              <option value="Hatchback">Hatchback (Budget & City)</option>
+              <option value="Sedan">Sedan (Comfort & Long Drive)</option>
+              <option value="SUV">SUV (Adventure & Family)</option>
+              <option value="Luxury">Luxury (Premium Saloons)</option>
+              <option value="Electric">Electric (Eco Friendly EV)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-accent btn-block" style="padding: 0.9rem; font-size: 1rem; margin-top: 0.5rem;">
+          <i class="fa-solid fa-magnifying-glass"></i> Search Available Cars
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Category Pills Filter Bar -->
+<div class="category-pills-bar">
+  <a href="{{ url_for('public.cars') }}" class="category-pill active">
+    <span>🚗</span> All Rides
+  </a>
+  <a href="{{ url_for('public.cars', category='Hatchback') }}" class="category-pill">
+    <span>⚡</span> Hatchback
+  </a>
+  <a href="{{ url_for('public.cars', category='Sedan') }}" class="category-pill">
+    <span>🚘</span> City Sedan
+  </a>
+  <a href="{{ url_for('public.cars', category='SUV') }}" class="category-pill">
+    <span>🚙</span> Tough SUV
+  </a>
+  <a href="{{ url_for('public.cars', category='Luxury') }}" class="category-pill">
+    <span>✨</span> Luxury
+  </a>
+  <a href="{{ url_for('public.cars', category='Electric') }}" class="category-pill">
+    <span>🔋</span> Electric EV
+  </a>
+</div>
+
+<!-- Featured Cars Section -->
+<section class="section">
+  <div class="section-header">
+    <div>
+      <h2>Featured Rental Cars</h2>
+      <p>Clean, certified, sanitized self-drive cars ready for your next adventure</p>
+    </div>
+    <a href="{{ url_for('public.cars') }}" class="btn btn-outline-dark btn-sm">
+      View All Cars <i class="fa-solid fa-arrow-right"></i>
+    </a>
+  </div>
+
+  <div class="cars-grid">
+    {% for car in featured_cars %}
+      <div class="car-card">
+        <div class="car-card-img-wrapper">
+          <img src="{{ car.image_url }}" alt="{{ car.name }}" class="car-card-img" onerror="this.src='/static/images/default_car.jpg'">
+          <span class="car-badge-category {{ car.get_badge_class() }}">{{ car.category }}</span>
+          <span class="car-badge-location"><i class="fa-solid fa-location-dot" style="color: #EF4444;"></i> {{ car.location }}</span>
+        </div>
+
+        <div class="car-card-body">
+          <div class="car-title-row">
+            <div>
+              <div class="car-card-name">{{ car.name }}</div>
+              <div style="font-size: 0.8rem; color: #6B7280; font-weight: 600;">{{ car.brand }} &bull; {{ car.year }}</div>
+            </div>
+            <div class="car-rating-pill">
+              <i class="fa-solid fa-star"></i> {{ car.avg_rating if car.avg_rating > 0 else '5.0' }}
+            </div>
+          </div>
+
+          <div class="car-specs-row">
+            <div class="spec-item"><i class="fa-solid fa-gas-pump"></i> {{ car.fuel_type }}</div>
+            <div class="spec-item"><i class="fa-solid fa-gear"></i> {{ car.transmission }}</div>
+            <div class="spec-item"><i class="fa-solid fa-user-group"></i> {{ car.seating_capacity }} Seats</div>
+          </div>
+
+          <div class="car-card-footer">
+            <div class="car-price-box">
+              <span class="rate">{{ currency }}{{ "{:,.0f}".format(car.price_per_day) }}</span>
+              <span class="period">per day</span>
+              <span class="period" style="display: block; font-size: 0.75rem; color: #F59E0B; font-weight: 700; margin-top: 2px;">
+                + {{ currency }}{{ car.price_per_km | int }}/km
+              </span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="{{ url_for('public.car_details', car_id=car.id) }}" class="btn btn-outline-dark btn-sm">Details</a>
+              <a href="{{ url_for('customer.book_car', car_id=car.id) }}" class="btn btn-accent btn-sm">Book</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Why DriveEase Banner (Rapido / Uber USP) -->
+<section style="background: #FFFFFF; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); padding: 4.5rem 1.5rem;">
+  <div style="max-width: 1280px; margin: 0 auto;">
+    <div style="text-align: center; max-width: 650px; margin: 0 auto 3.5rem;">
+      <span class="role-tag" style="background: #FEF3C7; color: #B45309; font-size: 0.8rem; padding: 0.3rem 0.8rem;">THE DRIVEEASE DIFFERENCE</span>
+      <h2 style="font-size: 2.3rem; font-weight: 900; margin-top: 0.6rem; letter-spacing: -0.5px;">Why Rent With Us?</h2>
+      <p style="color: #6B7280; font-size: 1rem; margin-top: 0.4rem;">Modeled after industry giants like Uber and Rapido, engineered for self-drive freedom.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem;">
+      <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 16px; padding: 2rem; transition: var(--transition);">
+        <div style="width: 50px; height: 50px; background: #FFC000; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #111; margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">100% Verified Hosts</h3>
+        <p style="color: #6B7280; font-size: 0.9rem; line-height: 1.6;">Every car listing, RC document, and host is rigorously verified by administrators before appearing live.</p>
+      </div>
+
+      <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 16px; padding: 2rem; transition: var(--transition);">
+        <div style="width: 50px; height: 50px; background: #0A0E17; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #FFC000; margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-receipt"></i>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">Transparent Fare Engine</h3>
+        <p style="color: #6B7280; font-size: 0.9rem; line-height: 1.6;">No hidden fees. Live calculation engine calculates exact day fares, GST, and security deposits upfront.</p>
+      </div>
+
+      <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 16px; padding: 2rem; transition: var(--transition);">
+        <div style="width: 50px; height: 50px; background: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #FFFFFF; margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-qrcode"></i>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">Fast Digital Payments</h3>
+        <p style="color: #6B7280; font-size: 0.9rem; line-height: 1.6;">Seamless payments via instant UPI QR code, Credit/Debit cards, or cash on pickup with verified tax invoices.</p>
+      </div>
+
+      <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 16px; padding: 2rem; transition: var(--transition);">
+        <div style="width: 50px; height: 50px; background: #3B82F6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #FFFFFF; margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">Genuine Renter Reviews</h3>
+        <p style="color: #6B7280; font-size: 0.9rem; line-height: 1.6;">Only customers with completed bookings can leave 1-to-5 star ratings, ensuring 100% authentic community reviews.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Customer Reviews Showcase -->
+{% if recent_reviews %}
+<section class="section">
+  <div class="section-header">
+    <div>
+      <h2>What Renters Say</h2>
+      <p>Real feedback from travelers who rented through DriveEase</p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+    {% for rev in recent_reviews %}
+      <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+        <div style="color: #F59E0B; font-size: 1.1rem; margin-bottom: 0.6rem;">
+          {{ "★" * rev.rating + "☆" * (5 - rev.rating) }}
+        </div>
+        <p style="font-style: italic; color: #374151; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem;">
+          "{{ rev.comment }}"
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F3F4F6; padding-top: 0.85rem;">
+          <span style="font-weight: 800; color: var(--text-primary);">{{ rev.customer_name }}</span>
+          <span style="font-size: 0.8rem; color: #6B7280; font-weight: 600;">Rented {{ rev.car_name }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

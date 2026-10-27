@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}System & Financial Reports - Admin Console{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar" style="background: var(--accent-yellow); color: var(--primary-dark);">A</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="background: #EDE9FE; color: #7C3AED; font-size: 0.65rem;">Platform Admin</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
+      <li><a href="{{ url_for('admin.verify_cars') }}" class="sidebar-link"><i class="fa-solid fa-shield-halved"></i> Verify Cars</a></li>
+      <li><a href="{{ url_for('admin.manage_users') }}" class="sidebar-link"><i class="fa-solid fa-users"></i> Users Directory</a></li>
+      <li><a href="{{ url_for('admin.all_bookings') }}" class="sidebar-link"><i class="fa-solid fa-calendar-days"></i> All Bookings</a></li>
+      <li><a href="{{ url_for('admin.payments') }}" class="sidebar-link"><i class="fa-solid fa-receipt"></i> Payment Records</a></li>
+      <li><a href="{{ url_for('admin.reviews') }}" class="sidebar-link"><i class="fa-solid fa-star"></i> Review Moderation</a></li>
+      <li><a href="{{ url_for('admin.reports') }}" class="sidebar-link active"><i class="fa-solid fa-file-chart-column"></i> System Reports</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>Analytical Reports & Statistics</h1>
+        <p>Operational KPI summaries and vehicle category yield analysis for business intelligence.</p>
+      </div>
+      <button onclick="window.print()" class="btn btn-outline-dark btn-sm">
+        <i class="fa-solid fa-print"></i> Print Report
+      </button>
+    </div>
+
+    <!-- KPI Summary Grid -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h3>Platform Key Performance Indicators (KPIs)</h3>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem;">
+        <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 12px; padding: 1.25rem;">
+          <div style="font-size: 0.8rem; color: #6B7280; text-transform: uppercase; font-weight: 700;">Total Revenue</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #059669; margin-top: 0.2rem;">{{ currency }}{{ "{:,.2f}".format(metrics.total_revenue) }}</div>
+          <div style="font-size: 0.75rem; color: #059669; font-weight: 600; margin-top: 0.2rem;">Processed via UPI/Card</div>
+        </div>
+
+        <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 12px; padding: 1.25rem;">
+          <div style="font-size: 0.8rem; color: #6B7280; text-transform: uppercase; font-weight: 700;">Rental Utilization</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: var(--primary-dark); margin-top: 0.2rem;">{{ metrics.confirmed_bookings }} Active</div>
+          <div style="font-size: 0.75rem; color: #6B7280; font-weight: 600; margin-top: 0.2rem;">Out of {{ metrics.total_bookings }} Total Trips</div>
+        </div>
+
+        <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 12px; padding: 1.25rem;">
+          <div style="font-size: 0.8rem; color: #6B7280; text-transform: uppercase; font-weight: 700;">Host Community</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #D97706; margin-top: 0.2rem;">{{ metrics.total_owners }} Hosts</div>
+          <div style="font-size: 0.75rem; color: #6B7280; font-weight: 600; margin-top: 0.2rem;">Listing {{ metrics.total_cars }} Cars</div>
+        </div>
+
+        <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 12px; padding: 1.25rem;">
+          <div style="font-size: 0.8rem; color: #6B7280; text-transform: uppercase; font-weight: 700;">Feedback Score</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #7C3AED; margin-top: 0.2rem;">{{ metrics.total_reviews }} Reviews</div>
+          <div style="font-size: 0.75rem; color: #059669; font-weight: 600; margin-top: 0.2rem;">Verified Renter Feedback</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Pricing & Fleet Yield Table -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h3>Category Yield & Average Daily Pricing</h3>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Vehicle Category</th>
+            <th>Active Fleet Count</th>
+            <th>Average Daily Rate</th>
+            <th>Platform Share</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in categories %}
+            <tr>
+              <td><strong>{{ c.category }}</strong></td>
+              <td>{{ c.car_count }} Vehicles</td>
+              <td>{{ currency }}{{ "{:,.2f}".format(c.avg_price) }} / day</td>
+              <td>
+                {% if metrics.total_cars > 0 %}
+                  {{ "{:.1f}%".format((c.car_count / metrics.total_cars) * 100) }}
+                {% else %}
+                  0%
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+{% endblock %}

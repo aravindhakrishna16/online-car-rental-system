@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Vehicle - DriveEase Host Portal{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar" style="background: var(--primary-dark); color: var(--accent-yellow);">{{ current_user.name[:1] }}</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="background: #FEF3C7; color: #B45309; font-size: 0.65rem;">Car Owner / Host</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('owner.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+      <li><a href="{{ url_for('owner.my_cars') }}" class="sidebar-link"><i class="fa-solid fa-car-side"></i> My Fleet</a></li>
+      <li><a href="{{ url_for('owner.add_car') }}" class="sidebar-link active"><i class="fa-solid fa-circle-plus"></i> List New Car</a></li>
+      <li><a href="{{ url_for('auth.profile') }}" class="sidebar-link"><i class="fa-solid fa-user-pen"></i> Host Profile</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <a href="{{ url_for('owner.my_cars') }}" style="font-size: 0.82rem; color: #6B7280; font-weight: 700;">
+          <i class="fa-solid fa-arrow-left"></i> Back to Fleet
+        </a>
+        <h1 style="margin-top: 0.3rem;">{{ action }} Vehicle Listing</h1>
+        <p>List your vehicle specifications and photos to start receiving booking requests.</p>
+      </div>
+    </div>
+
+    <div class="dashboard-card" style="max-width: 800px;">
+      <form action="{% if action == 'Add' %}{{ url_for('owner.add_car') }}{% else %}{{ url_for('owner.edit_car', car_id=car.id) }}{% endif %}" method="POST" enctype="multipart/form-data">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label>Car Display Name</label>
+            <input type="text" name="name" value="{{ car.name if car else '' }}" placeholder="e.g. Honda City ZX" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+
+          <div class="form-group">
+            <label>Brand / Manufacturer</label>
+            <input type="text" name="brand" value="{{ car.brand if car else '' }}" placeholder="e.g. Honda, Hyundai, Tata" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label>Model</label>
+            <input type="text" name="model" value="{{ car.model if car else '' }}" placeholder="e.g. City" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+
+          <div class="form-group">
+            <label>Year</label>
+            <input type="number" name="year" value="{{ car.year if car else 2024 }}" min="2012" max="2026" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+
+          <div class="form-group">
+            <label>Registration Number</label>
+            <input type="text" name="registration_number" value="{{ car.registration_number if car else '' }}" placeholder="KA01MF1234" class="form-control" style="padding-left: 0.85rem; text-transform: uppercase;" {% if action == 'Edit' %}readonly style="background:#F3F4F6;"{% else %}required{% endif %}>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category" class="form-control" style="padding-left: 0.85rem;">
+              {% for cat in ['Hatchback', 'Sedan', 'SUV', 'Luxury', 'Electric'] %}
+                <option value="{{ cat }}" {% if car and car.category == cat %}selected{% endif %}>{{ cat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Fuel Type</label>
+            <select name="fuel_type" class="form-control" style="padding-left: 0.85rem;">
+              {% for ft in ['Petrol', 'Diesel', 'Electric', 'Hybrid', 'CNG'] %}
+                <option value="{{ ft }}" {% if car and car.fuel_type == ft %}selected{% endif %}>{{ ft }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Transmission</label>
+            <select name="transmission" class="form-control" style="padding-left: 0.85rem;">
+              <option value="Manual" {% if car and car.transmission == 'Manual' %}selected{% endif %}>Manual</option>
+              <option value="Automatic" {% if car and car.transmission == 'Automatic' %}selected{% endif %}>Automatic</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Seats</label>
+            <input type="number" name="seating_capacity" value="{{ car.seating_capacity if car else 5 }}" min="2" max="10" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label>Rental Price Per Day (₹)</label>
+            <input type="number" name="price_per_day" value="{{ car.price_per_day if car else 2000.0 }}" step="50" min="500" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+
+          <div class="form-group">
+            <label>Per KM Rate (₹/km) <span style="color: #F59E0B; font-size: 0.8rem; font-weight: 700;">*Per-KM</span></label>
+            <input type="number" name="price_per_km" value="{{ car.price_per_km if car else 10.0 }}" step="0.5" min="2" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+
+          <div class="form-group">
+            <label>Location / City</label>
+            <input type="text" name="location" value="{{ car.location if car else 'Bangalore' }}" placeholder="e.g. Bangalore, Mumbai, Delhi" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label>Car Photo Upload</label>
+          <input type="file" name="car_image" accept="image/*" class="form-control" style="padding: 0.5rem 0.85rem;">
+          {% if car and car.image_url %}
+            <div style="font-size: 0.8rem; color: #6B7280; margin-top: 0.3rem;">Current image: <a href="{{ car.image_url }}" target="_blank">{{ car.image_url }}</a></div>
+          {% endif %}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.75rem;">
+          <label>Description & Features</label>
+          <textarea name="description" rows="3" class="form-control" style="padding-left: 0.85rem;" placeholder="Mention vehicle condition, audio system, sunroof, child seats, etc.">{{ car.description if car else '' }}</textarea>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+          <button type="submit" class="btn btn-accent" style="padding: 0.85rem 2rem;">
+            <i class="fa-solid fa-floppy-disk"></i> {{ action }} Vehicle Listing
+          </button>
+          <a href="{{ url_for('owner.my_cars') }}" class="btn btn-outline">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}

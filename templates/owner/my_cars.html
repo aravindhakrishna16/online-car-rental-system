@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}My Fleet - DriveEase Car Owner Portal{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar" style="background: var(--primary-dark); color: var(--accent-yellow);">{{ current_user.name[:1] }}</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="background: #FEF3C7; color: #B45309; font-size: 0.65rem;">Car Owner / Host</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('owner.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+      <li><a href="{{ url_for('owner.my_cars') }}" class="sidebar-link active"><i class="fa-solid fa-car-side"></i> My Fleet ({{ cars|length }})</a></li>
+      <li><a href="{{ url_for('owner.add_car') }}" class="sidebar-link"><i class="fa-solid fa-circle-plus"></i> List New Car</a></li>
+      <li><a href="{{ url_for('auth.profile') }}" class="sidebar-link"><i class="fa-solid fa-user-pen"></i> Host Profile</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>My Vehicle Fleet</h1>
+        <p>Manage listing specifications, verify documents, and toggle booking availability.</p>
+      </div>
+      <a href="{{ url_for('owner.add_car') }}" class="btn btn-accent btn-sm">
+        <i class="fa-solid fa-plus"></i> List New Vehicle
+      </a>
+    </div>
+
+    <div class="dashboard-card">
+      {% if cars %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th>Specifications</th>
+                <th>Location</th>
+                <th>Pricing</th>
+                <th>Admin Approval</th>
+                <th>Availability</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for car in cars %}
+                <tr>
+                  <td>
+                    <div class="table-car-cell">
+                      <img src="{{ car.image_url }}" alt="{{ car.name }}" class="table-car-thumb" onerror="this.src='/static/images/default_car.jpg'">
+                      <div class="table-car-info">
+                        <span class="table-car-title">{{ car.name }}</span>
+                        <span class="table-car-sub" style="font-family: monospace;">{{ car.registration_number }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div style="font-size: 0.85rem; font-weight: 700;">{{ car.category }} &bull; {{ car.fuel_type }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ car.transmission }} &bull; {{ car.seating_capacity }} seats</div>
+                  </td>
+                  <td>{{ car.location }}</td>
+                  <td>
+                    <strong>{{ currency }}{{ "{:,.0f}".format(car.price_per_day) }}/day</strong>
+                    <div style="font-size: 0.75rem; color: #D97706; font-weight: 700;">+{{ currency }}{{ "{:,.0f}".format(car.price_per_km or 10.0) }}/km</div>
+                  </td>
+                  <td>
+                    {% if car.approval_status == 'approved' %}
+                      <span class="role-tag badge-success"><i class="fa-solid fa-check"></i> Approved</span>
+                    {% elif car.approval_status == 'pending' %}
+                      <span class="role-tag badge-warning"><i class="fa-solid fa-clock"></i> Verification Pending</span>
+                    {% else %}
+                      <span class="role-tag badge-danger"><i class="fa-solid fa-xmark"></i> Rejected</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <form action="{{ url_for('owner.toggle_availability', car_id=car.id) }}" method="POST">
+                      <button type="submit" class="btn btn-sm {% if car.is_available %}btn-outline-dark{% else %}btn-outline{% endif %}" style="font-size: 0.75rem;">
+                        {% if car.is_available %}
+                          🟢 Available
+                        {% else %}
+                          🔴 Paused
+                        {% endif %}
+                      </button>
+                    </form>
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 0.4rem;">
+                      <a href="{{ url_for('owner.edit_car', car_id=car.id) }}" class="btn btn-outline btn-sm">
+                        <i class="fa-solid fa-pen"></i> Edit
+                      </a>
+                      <form action="{{ url_for('owner.delete_car', car_id=car.id) }}" method="POST" onsubmit="return confirm('Permanently delete listing {{ car.name }}?');">
+                        <button type="submit" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #FECACA;">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 3rem 1rem;">
+          <p style="color: #6B7280; font-size: 1rem; margin-bottom: 1rem;">You have not listed any cars yet.</p>
+          <a href="{{ url_for('owner.add_car') }}" class="btn btn-accent">List Your First Car</a>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

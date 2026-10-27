@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - DriveEase{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar">{{ current_user.name[:1] }}</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="font-size: 0.65rem;">{{ current_user.role|capitalize }}</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      {% if current_user.role == 'customer' %}
+        <li><a href="{{ url_for('customer.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-car"></i> My Bookings</a></li>
+      {% elif current_user.role == 'owner' %}
+        <li><a href="{{ url_for('owner.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Host Dashboard</a></li>
+        <li><a href="{{ url_for('owner.my_cars') }}" class="sidebar-link"><i class="fa-solid fa-car-side"></i> My Fleet</a></li>
+      {% else %}
+        <li><a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Admin Dashboard</a></li>
+      {% endif %}
+      <li><a href="{{ url_for('auth.profile') }}" class="sidebar-link active"><i class="fa-solid fa-user-pen"></i> My Profile</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Profile Form -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>Profile Settings</h1>
+        <p>Update your personal information and contact details.</p>
+      </div>
+    </div>
+
+    <div class="dashboard-card" style="max-width: 640px;">
+      <form action="{{ url_for('auth.profile') }}" method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.1rem;">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="name" value="{{ user.name }}" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" name="phone" value="{{ user.phone }}" class="form-control" style="padding-left: 0.85rem;" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.1rem;">
+          <label>Email Address (Immutable)</label>
+          <input type="email" value="{{ user.email }}" class="form-control" style="padding-left: 0.85rem; background: #F3F4F6;" disabled>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.1rem;">
+          <div class="form-group">
+            <label>Driving License No.</label>
+            <input type="text" name="license_number" value="{{ user.license_number or '' }}" class="form-control" style="padding-left: 0.85rem;" placeholder="DL-1420110012345">
+          </div>
+          <div class="form-group">
+            <label>Address / City</label>
+            <input type="text" name="address" value="{{ user.address or '' }}" class="form-control" style="padding-left: 0.85rem;" placeholder="Bangalore, Karnataka">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label>New Password (Leave blank to keep unchanged)</label>
+          <input type="password" name="new_password" class="form-control" style="padding-left: 0.85rem;" placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="btn btn-accent" style="padding: 0.8rem 1.8rem;">
+          <i class="fa-solid fa-floppy-disk"></i> Save Profile Changes
+        </button>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}

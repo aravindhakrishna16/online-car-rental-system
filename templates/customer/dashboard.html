@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Dashboard - My Bookings | DriveEase{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar">{{ current_user.name[:1] }}</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="font-size: 0.65rem;">Customer / Renter</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('customer.dashboard') }}" class="sidebar-link active"><i class="fa-solid fa-car"></i> My Bookings</a></li>
+      <li><a href="{{ url_for('public.cars') }}" class="sidebar-link"><i class="fa-solid fa-magnifying-glass"></i> Book a Car</a></li>
+      <li><a href="{{ url_for('auth.profile') }}" class="sidebar-link"><i class="fa-solid fa-user-pen"></i> My Profile</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>My Rentals Dashboard</h1>
+        <p>Monitor your vehicle reservations, invoices, and completed journeys.</p>
+      </div>
+      <a href="{{ url_for('public.cars') }}" class="btn btn-accent btn-sm">
+        <i class="fa-solid fa-plus"></i> New Reservation
+      </a>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fa-solid fa-car-side"></i></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ active_bookings|length }}</div>
+          <div class="stat-label">Active / Upcoming</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ completed_bookings|length }}</div>
+          <div class="stat-label">Trips Completed</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-wallet"></i></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ currency }}{{ "{:,.0f}".format(total_spent) }}</div>
+          <div class="stat-label">Total Spent</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active / Pending Bookings Table -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h3>Active & Upcoming Reservations</h3>
+      </div>
+
+      {% if active_bookings %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Booking Ref</th>
+                <th>Vehicle</th>
+                <th>Rental Dates</th>
+                <th>Total Fare</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in active_bookings %}
+                <tr>
+                  <td><strong style="font-family: monospace;">{{ b.booking_reference }}</strong></td>
+                  <td>
+                    <div class="table-car-cell">
+                      <img src="{{ b.car_image }}" alt="{{ b.car_name }}" class="table-car-thumb" onerror="this.src='/static/images/default_car.jpg'">
+                      <div class="table-car-info">
+                        <span class="table-car-title">{{ b.car_name }}</span>
+                        <span class="table-car-sub">{{ b.car_registration }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div style="font-size: 0.85rem; font-weight: 700;">{{ b.start_date }} &rarr; {{ b.end_date }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ b.total_days }} day(s)</div>
+                  </td>
+                  <td><strong>{{ currency }}{{ "{:,.2f}".format(b.total_amount) }}</strong></td>
+                  <td>
+                    <span class="role-tag {{ b.get_status_badge_class() }}">{{ b.booking_status }}</span>
+                  </td>
+                  <td>
+                    {% if b.payment_status == 'Completed' %}
+                      <span class="role-tag badge-success"><i class="fa-solid fa-check"></i> Paid</span>
+                    {% else %}
+                      <a href="{{ url_for('customer.make_payment', booking_ref=b.booking_reference) }}" class="btn btn-accent btn-sm">
+                        <i class="fa-solid fa-credit-card"></i> Pay Now
+                      </a>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 0.4rem;">
+                      {% if b.can_cancel() %}
+                        <form action="{{ url_for('customer.cancel_booking', booking_id=b.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                          <button type="submit" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #FECACA;">
+                            Cancel
+                          </button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: #6B7280; font-style: italic; padding: 1rem 0;">You have no active or pending reservations right now.</p>
+      {% endif %}
+    </div>
+
+    <!-- Booking History Table -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h3>Trip History</h3>
+      </div>
+
+      {% set past_bookings = bookings|rejectattr('booking_status', 'in', ['Pending', 'Confirmed'])|list %}
+      {% if past_bookings %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Booking Ref</th>
+                <th>Vehicle</th>
+                <th>Dates</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in past_bookings %}
+                <tr>
+                  <td><span style="font-family: monospace; font-weight: 700;">{{ b.booking_reference }}</span></td>
+                  <td>
+                    <div class="table-car-cell">
+                      <img src="{{ b.car_image }}" alt="{{ b.car_name }}" class="table-car-thumb" onerror="this.src='/static/images/default_car.jpg'">
+                      <div class="table-car-info">
+                        <span class="table-car-title">{{ b.car_name }}</span>
+                        <span class="table-car-sub">{{ b.car_brand }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ b.start_date }} &rarr; {{ b.end_date }}</td>
+                  <td>{{ currency }}{{ "{:,.2f}".format(b.total_amount) }}</td>
+                  <td>
+                    <span class="role-tag {{ b.get_status_badge_class() }}">{{ b.booking_status }}</span>
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                      {% if b.booking_status == 'Completed' %}
+                        {% if b.can_review() %}
+                          <button class="btn btn-accent btn-sm" onclick="openReviewModal('{{ b.id }}', '{{ b.car_name }}')">
+                            <i class="fa-solid fa-star"></i> Rate Ride
+                          </button>
+                        {% else %}
+                          <span style="font-size: 0.8rem; color: #059669; font-weight: 700;"><i class="fa-solid fa-star"></i> Reviewed</span>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: #6B7280; font-style: italic; padding: 1rem 0;">No completed past trips found.</p>
+      {% endif %}
+    </div>
+  </main>
+</div>
+
+<!-- Modal for Submitting Review -->
+<div id="reviewModal" class="modal-overlay">
+  <div class="modal-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.25rem; font-weight: 800;">Rate Your Journey</h3>
+      <button onclick="closeReviewModal()" style="background: none; border: none; font-size: 1.4rem; cursor: pointer;">&times;</button>
+    </div>
+
+    <form id="reviewForm" method="POST">
+      <div style="margin-bottom: 1.25rem; text-align: center;">
+        <div style="font-size: 0.95rem; font-weight: 700; color: #4B5563; margin-bottom: 0.5rem;" id="modalCarName">Vehicle</div>
+        <div class="star-rating-select" style="justify-content: center;">
+          <input type="radio" id="star5" name="rating" value="5" checked><label for="star5">★</label>
+          <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+          <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+          <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+          <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label>Your Feedback</label>
+        <textarea name="comment" rows="4" class="form-control" style="padding-left: 0.85rem;" placeholder="How was the car performance, cleanliness, and host communication?" required></textarea>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeReviewModal()">Cancel</button>
+        <button type="submit" class="btn btn-accent" style="flex: 1;"><i class="fa-solid fa-paper-plane"></i> Submit Review</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

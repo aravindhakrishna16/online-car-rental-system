@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}User Directory Governance - Admin Console{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar" style="background: var(--accent-yellow); color: var(--primary-dark);">A</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="background: #EDE9FE; color: #7C3AED; font-size: 0.65rem;">Platform Admin</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
+      <li><a href="{{ url_for('admin.verify_cars') }}" class="sidebar-link"><i class="fa-solid fa-shield-halved"></i> Verify Cars</a></li>
+      <li><a href="{{ url_for('admin.manage_users') }}" class="sidebar-link active"><i class="fa-solid fa-users"></i> Users Directory</a></li>
+      <li><a href="{{ url_for('admin.all_bookings') }}" class="sidebar-link"><i class="fa-solid fa-calendar-days"></i> All Bookings</a></li>
+      <li><a href="{{ url_for('admin.payments') }}" class="sidebar-link"><i class="fa-solid fa-receipt"></i> Payment Records</a></li>
+      <li><a href="{{ url_for('admin.reviews') }}" class="sidebar-link"><i class="fa-solid fa-star"></i> Review Moderation</a></li>
+      <li><a href="{{ url_for('admin.reports') }}" class="sidebar-link"><i class="fa-solid fa-file-chart-column"></i> System Reports</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>Users Directory & Access Control</h1>
+        <p>Manage customer and host accounts, review license numbers, and toggle account activity.</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-tabs">
+      <a href="{{ url_for('admin.manage_users', role='all') }}" class="filter-tab-btn {% if role_filter == 'all' %}active{% endif %}">All Users ({{ users|length }})</a>
+      <a href="{{ url_for('admin.manage_users', role='customer') }}" class="filter-tab-btn {% if role_filter == 'customer' %}active{% endif %}">Customers</a>
+      <a href="{{ url_for('admin.manage_users', role='owner') }}" class="filter-tab-btn {% if role_filter == 'owner' %}active{% endif %}">Car Owners</a>
+      <a href="{{ url_for('admin.manage_users', role='admin') }}" class="filter-tab-btn {% if role_filter == 'admin' %}active{% endif %}">Administrators</a>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name & Contact</th>
+              <th>Role</th>
+              <th>License / Address</th>
+              <th>Status</th>
+              <th>Joined Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+              <tr>
+                <td>#{{ u.id }}</td>
+                <td>
+                  <div style="font-weight: 800; font-size: 0.95rem;">{{ u.name }}</div>
+                  <div style="font-size: 0.8rem; color: #6B7280;">{{ u.email }} &bull; 📞 {{ u.phone }}</div>
+                </td>
+                <td>
+                  <span class="role-tag {% if u.role == 'admin' %}badge-primary{% elif u.role == 'owner' %}badge-warning{% else %}badge-secondary{% endif %}">
+                    {{ u.role|capitalize }}
+                  </span>
+                </td>
+                <td>
+                  <div style="font-size: 0.82rem; font-family: monospace;">{{ u.license_number or 'No DL Submitted' }}</div>
+                  <div style="font-size: 0.75rem; color: #6B7280;">{{ u.address or 'N/A' }}</div>
+                </td>
+                <td>
+                  {% if u.is_active() %}
+                    <span class="role-tag badge-success">Active</span>
+                  {% else %}
+                    <span class="role-tag badge-danger">Deactivated</span>
+                  {% endif %}
+                </td>
+                <td style="font-size: 0.8rem; color: #6B7280;">{{ u.created_at }}</td>
+                <td>
+                  {% if u.id != current_user.id %}
+                    <form action="{{ url_for('admin.toggle_user', user_id=u.id) }}" method="POST">
+                      <button type="submit" class="btn btn-sm {% if u.is_active() %}btn-outline{% else %}btn-success{% endif %}" style="font-size: 0.75rem; color: {% if u.is_active() %}var(--danger){% else %}white{% endif %};">
+                        {% if u.is_active() %}Deactivate{% else %}Reactivate{% endif %}
+                      </button>
+                    </form>
+                  {% else %}
+                    <span style="font-size: 0.75rem; color: #9CA3AF; font-style: italic;">Current Session</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

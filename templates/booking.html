@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Book {{ car.name }} - DriveEase{% endblock %}
+
+{% block content %}
+<div class="section" style="max-width: 960px; padding-top: 2.5rem;">
+  <div style="margin-bottom: 2rem;">
+    <a href="{{ url_for('public.car_details', car_id=car.id) }}" style="font-size: 0.85rem; color: #6B7280; font-weight: 700;">
+      <i class="fa-solid fa-arrow-left"></i> Back to Car Details
+    </a>
+    <h1 style="font-size: 2.2rem; font-weight: 900; margin-top: 0.5rem; letter-spacing: -0.5px;">Confirm Your Booking</h1>
+    <p style="color: #6B7280;">Review rental duration, locations, estimated kilometres, and fare breakdown before payment.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem; align-items: flex-start;">
+
+    <!-- Booking Form -->
+    <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 2rem; box-shadow: var(--shadow-sm);">
+      <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.75rem;">
+        Trip Details
+      </h3>
+
+      <form action="{{ url_for('customer.book_car', car_id=car.id) }}" method="POST">
+        <input type="hidden" id="bookingCarId" value="{{ car.id }}">
+        <input type="hidden" id="carPricePerDay" value="{{ car.price_per_day }}">
+        <input type="hidden" id="carPricePerKm" value="{{ car.price_per_km }}">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label>Pickup Date</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-calendar-days icon"></i>
+              <input type="date" name="start_date" id="bookingStartDate" value="{{ pre_start }}" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Return Date</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-calendar-check icon"></i>
+              <input type="date" name="end_date" id="bookingEndDate" value="{{ pre_end }}" class="form-control" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label>Pickup Location / Address</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-location-dot icon"></i>
+            <input type="text" name="pickup_location" value="{{ car.location }}" class="form-control" placeholder="e.g. Airport T1, Bangalore" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label>Drop-Off Location / Address</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-flag-checkered icon"></i>
+            <input type="text" name="drop_location" value="{{ car.location }}" class="form-control" placeholder="e.g. Airport T1, Bangalore" required>
+          </div>
+        </div>
+
+        <!-- Estimated KM Input -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-route" style="color: var(--accent-yellow);"></i>
+            Estimated Distance (km)
+            <span style="font-size: 0.75rem; font-weight: 500; color: #6B7280; background: #FEF3C7; padding: 0.15rem 0.5rem; border-radius: 99px; margin-left: 4px;">₹{{ car.price_per_km | int }}/km</span>
+          </label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-gauge-high icon"></i>
+            <input type="number" name="estimated_km" id="estimatedKm" value="{{ form.estimated_km if form else (pre_km if pre_km else 100) }}"
+              min="0" max="10000" step="10" class="form-control" placeholder="e.g. 200" required>
+          </div>
+          <div style="font-size: 0.78rem; color: #6B7280; margin-top: 0.35rem;">
+            <i class="fa-solid fa-circle-info"></i>
+            Enter your estimated total driving distance for this trip. You'll be charged ₹{{ car.price_per_km | int }} per km.
+          </div>
+        </div>
+
+        <!-- Availability Feedback -->
+        <div id="availabilityBadge" style="display: none; margin-bottom: 1.5rem;"></div>
+
+        <button type="submit" id="btnSubmitBooking" class="btn btn-accent btn-block" style="padding: 1rem; font-size: 1.05rem;">
+          <i class="fa-solid fa-lock"></i> Submit Booking &amp; Pay Now
+        </button>
+      </form>
+    </div>
+
+    <!-- Summary Vehicle Card & Price Breakdown -->
+    <div>
+      <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.75rem; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;">
+        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #F3F4F6;">
+          <img src="{{ car.image_url }}" alt="{{ car.name }}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='/static/images/default_car.jpg'">
+          <div>
+            <h4 style="font-size: 1.1rem; font-weight: 800;">{{ car.name }}</h4>
+            <div style="font-size: 0.8rem; color: #6B7280;">{{ car.category }} &bull; {{ car.fuel_type }}</div>
+            <div style="font-size: 0.85rem; font-weight: 800; color: var(--primary-dark); margin-top: 2px;">
+              {{ currency }}{{ "{:,.0f}".format(car.price_per_day) }} / day
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; color: #6B7280; margin-bottom: 0.75rem;">Live Fare Breakdown</div>
+
+        <div class="invoice-row">
+          <span>Rental Days</span>
+          <strong id="calcDays">1 Day</strong>
+        </div>
+        <div class="invoice-row">
+          <span>Daily Rate</span>
+          <span>{{ currency }}{{ "{:,.0f}".format(car.price_per_day) }}</span>
+        </div>
+        <div class="invoice-row">
+          <span>Base Rental</span>
+          <span id="calcBaseFare">{{ currency }}{{ "{:,.0f}".format(car.price_per_day) }}</span>
+        </div>
+
+        <!-- KM Charges row -->
+        <div class="invoice-row" style="border-top: 1px dashed #E5E7EB; padding-top: 0.6rem; margin-top: 0.3rem;">
+          <span>
+            <i class="fa-solid fa-route" style="color: var(--accent-yellow); font-size: 0.8rem;"></i>
+            Est. Km Charges
+          </span>
+          <span id="calcKmCharges" style="color: #F59E0B; font-weight: 700;">{{ currency }}{{ "{:,.0f}".format(car.price_per_km * 100) }}</span>
+        </div>
+        <div class="invoice-row" style="font-size: 0.78rem; color: #9CA3AF; padding-top: 0; margin-top: -0.2rem;">
+          <span id="calcKmLabel">100 km × ₹{{ car.price_per_km | int }}/km</span>
+          <span></span>
+        </div>
+
+        <div class="invoice-row" style="border-top: 1px dashed #E5E7EB; padding-top: 0.6rem; margin-top: 0.3rem;">
+          <span>Taxes (5% GST)</span>
+          <span id="calcTaxes">{{ currency }}{{ "{:,.0f}".format((car.price_per_day + car.price_per_km * 100) * 0.05) }}</span>
+        </div>
+        <div class="invoice-row total">
+          <span>Estimated Total</span>
+          <span id="calcTotal" style="color: var(--primary-dark); font-size: 1.35rem;">
+            {{ currency }}{{ "{:,.0f}".format((car.price_per_day + car.price_per_km * 100) * 1.05) }}
+          </span>
+        </div>
+
+        <!-- Per-km info badge -->
+        <div style="margin-top: 0.75rem; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 0.65rem 0.8rem; font-size: 0.78rem; color: #92400E;">
+          <i class="fa-solid fa-gauge-high"></i>
+          <strong>Per-KM Rate: {{ currency }}{{ car.price_per_km | int }}/km</strong> — adjust the estimated km above to see your live fare update.
+        </div>
+      </div>
+
+      <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: var(--radius-sm); padding: 1rem; font-size: 0.82rem; color: #065F46;">
+        <i class="fa-solid fa-circle-check"></i> <strong>Transparent Pricing:</strong> Final km charges are estimated. Exact amount depends on actual distance driven at trip end.
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  const pricePerDay = parseFloat(document.getElementById('carPricePerDay').value) || 0;
+  const pricePerKm  = parseFloat(document.getElementById('carPricePerKm').value)  || 0;
+
+  const startInput = document.getElementById('bookingStartDate');
+  const endInput   = document.getElementById('bookingEndDate');
+  const kmInput    = document.getElementById('estimatedKm');
+
+  function updateFare() {
+    // Calculate days
+    let days = 1;
+    if (startInput.value && endInput.value) {
+      const diff = (new Date(endInput.value) - new Date(startInput.value)) / (1000 * 60 * 60 * 24);
+      days = diff > 0 ? diff : 1;
+    }
+
+    const km = Math.max(0, parseInt(kmInput.value) || 0);
+    const baseRental  = pricePerDay * days;
+    const kmCharges   = pricePerKm * km;
+    const subtotal    = baseRental + kmCharges;
+    const gst         = subtotal * 0.05;
+    const total       = subtotal + gst;
+
+    // Format helpers
+    const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
+
+    document.getElementById('calcDays').textContent      = days + (days === 1 ? ' Day' : ' Days');
+    document.getElementById('calcBaseFare').textContent  = fmt(baseRental);
+    document.getElementById('calcKmCharges').textContent = fmt(kmCharges);
+    document.getElementById('calcKmLabel').textContent   = km + ' km × ₹' + Math.round(pricePerKm) + '/km';
+    document.getElementById('calcTaxes').textContent     = fmt(gst);
+    document.getElementById('calcTotal').textContent     = fmt(total);
+  }
+
+  startInput.addEventListener('change', updateFare);
+  endInput.addEventListener('change', updateFare);
+  kmInput.addEventListener('input', updateFare);
+  updateFare();
+})();
+</script>
+{% endblock %}

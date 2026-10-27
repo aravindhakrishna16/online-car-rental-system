@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Review Moderation - Admin Console{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar" style="background: var(--accent-yellow); color: var(--primary-dark);">A</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="background: #EDE9FE; color: #7C3AED; font-size: 0.65rem;">Platform Admin</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
+      <li><a href="{{ url_for('admin.verify_cars') }}" class="sidebar-link"><i class="fa-solid fa-shield-halved"></i> Verify Cars</a></li>
+      <li><a href="{{ url_for('admin.manage_users') }}" class="sidebar-link"><i class="fa-solid fa-users"></i> Users Directory</a></li>
+      <li><a href="{{ url_for('admin.all_bookings') }}" class="sidebar-link"><i class="fa-solid fa-calendar-days"></i> All Bookings</a></li>
+      <li><a href="{{ url_for('admin.payments') }}" class="sidebar-link"><i class="fa-solid fa-receipt"></i> Payment Records</a></li>
+      <li><a href="{{ url_for('admin.reviews') }}" class="sidebar-link active"><i class="fa-solid fa-star"></i> Review Moderation</a></li>
+      <li><a href="{{ url_for('admin.reports') }}" class="sidebar-link"><i class="fa-solid fa-file-chart-column"></i> System Reports</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>Customer Reviews Moderation</h1>
+        <p>Monitor community feedback and remove spam, abusive, or policy-violating reviews.</p>
+      </div>
+    </div>
+
+    <div class="dashboard-card">
+      {% if reviews %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Car Reviewed</th>
+                <th>Stars</th>
+                <th>Feedback Comment</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in reviews %}
+                <tr>
+                  <td>
+                    <div style="font-weight: 700;">{{ r.customer_name }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ r.customer_email }}</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 700;">{{ r.car_name }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ r.car_brand }}</div>
+                  </td>
+                  <td>
+                    <span style="color: #F59E0B; font-size: 1rem; font-weight: 800;">
+                      {{ "★" * r.rating + "☆" * (5 - r.rating) }}
+                    </span>
+                  </td>
+                  <td style="max-width: 320px; font-size: 0.88rem; color: #374151;">
+                    "{{ r.comment }}"
+                  </td>
+                  <td style="font-size: 0.8rem; color: #6B7280;">{{ r.created_at }}</td>
+                  <td>
+                    <form action="{{ url_for('admin.delete_review', review_id=r.id) }}" method="POST" onsubmit="return confirm('Remove this review from public listings?');">
+                      <button type="submit" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #FECACA;">
+                        <i class="fa-solid fa-trash"></i> Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: #6B7280; font-style: italic; padding: 2rem 0; text-align: center;">No customer reviews submitted yet.</p>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

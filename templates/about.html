@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - DriveEase Self-Drive Car Rental{% endblock %}
+
+{% block content %}
+<div style="background: var(--primary-dark); color: #FFFFFF; padding: 3.5rem 1.5rem; border-bottom: 1px solid var(--border-dark);">
+  <div style="max-width: 1000px; margin: 0 auto;">
+    <span class="role-tag" style="background: rgba(255,192,0,0.15); color: var(--accent-yellow); font-size: 0.82rem; padding: 0.35rem 0.85rem;">
+      ⚡ ABOUT DRIVEEASE
+    </span>
+    <h1 style="font-size: 2.8rem; font-weight: 900; margin-top: 0.8rem; letter-spacing: -0.8px;">
+      Freedom to Move. Built for Every Journey.
+    </h1>
+    <p style="color: #9CA3AF; font-size: 1.15rem; line-height: 1.7; margin-top: 0.6rem; max-width: 750px;">
+      DriveEase is modernizing self-drive car rentals with verified vehicle hosts, transparent daily rates, 24/7 roadside assistance, and effortless mobile booking.
+    </p>
+  </div>
+</div>
+
+<div class="section" style="max-width: 1000px; padding-top: 3rem;">
+  
+  <!-- Our Mission & Story -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; align-items: center;">
+    <div>
+      <span class="role-tag" style="background: #FEF3C7; color: #B45309; margin-bottom: 0.8rem; display: inline-block;">OUR MISSION</span>
+      <h2 style="font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 1rem;">
+        Making Self-Drive Mobility Simple, Transparent & Accessible
+      </h2>
+      <p style="color: #4B5563; font-size: 0.95rem; line-height: 1.7; margin-bottom: 1rem;">
+        Whether you need a fuel-efficient hatchback for quick city commutes, an executive sedan for client meetings, an electric crossover for daily errands, or a tough 4x4 SUV for weekend adventures — DriveEase gives you the keys with zero hassle.
+      </p>
+      <p style="color: #4B5563; font-size: 0.95rem; line-height: 1.7;">
+        We connect verified private car owners who have idle vehicles with licensed, enthusiastic drivers seeking flexible rentals with complete peace of mind.
+      </p>
+    </div>
+
+    <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow-md);">
+      <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem;">Why Drivers Choose DriveEase</h3>
+      
+      <div style="display: flex; flex-direction: column; gap: 1.1rem;">
+        <div style="display: flex; gap: 0.85rem; align-items: flex-start;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: #FFC000; color: #111; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-bolt"></i></div>
+          <div>
+            <strong style="color: var(--primary-dark);">Instant Confirmation</strong>
+            <p style="font-size: 0.85rem; color: #6B7280; margin-top: 2px;">Search available cars, select rental dates, and reserve in under two minutes.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.85rem; align-items: flex-start;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: #10B981; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-shield-halved"></i></div>
+          <div>
+            <strong style="color: var(--primary-dark);">100% Verified Fleet</strong>
+            <p style="font-size: 0.85rem; color: #6B7280; margin-top: 2px;">Every car's registration, insurance, and sanitization is inspected before listing.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.85rem; align-items: flex-start;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: #3B82F6; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;"><i class="fa-solid fa-tag"></i></div>
+          <div>
+            <strong style="color: var(--primary-dark);">Zero Hidden Charges</strong>
+            <p style="font-size: 0.85rem; color: #6B7280; margin-top: 2px;">Transparent daily pricing including taxes, with digital invoices and receipts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works in 3 Steps -->
+  <div class="dashboard-card" style="margin-bottom: 3rem;">
+    <div class="dashboard-card-header">
+      <h3>How Renting Works</h3>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; padding: 0.5rem 0;">
+      <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 14px; padding: 1.5rem;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-dark); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; margin-bottom: 1rem;">1</div>
+        <h4 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.4rem;">Select Your Vehicle</h4>
+        <p style="font-size: 0.88rem; color: #6B7280; line-height: 1.6;">Browse our verified fleet across multiple categories, filter by your city and choose trip dates.</p>
+      </div>
+
+      <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 14px; padding: 1.5rem;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-dark); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; margin-bottom: 1rem;">2</div>
+        <h4 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.4rem;">Instant Fare & Booking</h4>
+        <p style="font-size: 0.88rem; color: #6B7280; line-height: 1.6;">View live price calculations, submit pickup and drop addresses, and confirm with demo payment.</p>
+      </div>
+
+      <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 14px; padding: 1.5rem;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-dark); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; margin-bottom: 1rem;">3</div>
+        <h4 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.4rem;">Drive with Freedom</h4>
+        <p style="font-size: 0.88rem; color: #6B7280; line-height: 1.6;">Meet the vehicle host at the agreed pickup point, grab the keys, and enjoy your self-drive trip.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Platform Stats -->
+  <div style="background: #0A0E17; color: #FFFFFF; border-radius: 20px; padding: 2.5rem 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; text-align: center; margin-bottom: 3rem;">
+    <div>
+      <div style="font-size: 2.5rem; font-weight: 900; color: var(--accent-yellow);">{{ stats.total_cars }}+</div>
+      <div style="font-size: 0.85rem; color: #9CA3AF; text-transform: uppercase; margin-top: 0.2rem;">Verified Vehicles</div>
+    </div>
+    <div>
+      <div style="font-size: 2.5rem; font-weight: 900; color: #FFFFFF;">{{ stats.total_bookings }}+</div>
+      <div style="font-size: 0.85rem; color: #9CA3AF; text-transform: uppercase; margin-top: 0.2rem;">Trips Completed</div>
+    </div>
+    <div>
+      <div style="font-size: 2.5rem; font-weight: 900; color: #10B981;">100%</div>
+      <div style="font-size: 0.85rem; color: #9CA3AF; text-transform: uppercase; margin-top: 0.2rem;">Sanitized Fleet</div>
+    </div>
+    <div>
+      <div style="font-size: 2.5rem; font-weight: 900; color: var(--accent-yellow);">4.9★</div>
+      <div style="font-size: 0.85rem; color: #9CA3AF; text-transform: uppercase; margin-top: 0.2rem;">Renter Satisfaction</div>
+    </div>
+  </div>
+
+  <!-- Host Your Car CTA -->
+  <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 20px; padding: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+    <div>
+      <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.3rem;">Own a Car? Turn It Into An Earning Fleet</h3>
+      <p style="color: #6B7280; font-size: 0.95rem; max-width: 550px;">
+        Share your car with trusted renters when you're not using it. Set your own daily price, approve every booking request, and earn steady revenue.
+      </p>
+    </div>
+    <a href="{{ url_for('auth.register', role='owner') }}" class="btn btn-accent" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
+      <i class="fa-solid fa-key"></i> Become a Host
+    </a>
+  </div>
+
+</div>
+{% endblock %}

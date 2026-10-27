@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}All Platform Bookings - Admin Console{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-profile-avatar" style="background: var(--accent-yellow); color: var(--primary-dark);">A</div>
+      <div class="sidebar-profile-info">
+        <h4>{{ current_user.name }}</h4>
+        <span class="role-tag" style="background: #EDE9FE; color: #7C3AED; font-size: 0.65rem;">Platform Admin</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
+      <li><a href="{{ url_for('admin.verify_cars') }}" class="sidebar-link"><i class="fa-solid fa-shield-halved"></i> Verify Cars</a></li>
+      <li><a href="{{ url_for('admin.manage_users') }}" class="sidebar-link"><i class="fa-solid fa-users"></i> Users Directory</a></li>
+      <li><a href="{{ url_for('admin.all_bookings') }}" class="sidebar-link active"><i class="fa-solid fa-calendar-days"></i> All Bookings</a></li>
+      <li><a href="{{ url_for('admin.payments') }}" class="sidebar-link"><i class="fa-solid fa-receipt"></i> Payment Records</a></li>
+      <li><a href="{{ url_for('admin.reviews') }}" class="sidebar-link"><i class="fa-solid fa-star"></i> Review Moderation</a></li>
+      <li><a href="{{ url_for('admin.reports') }}" class="sidebar-link"><i class="fa-solid fa-file-chart-column"></i> System Reports</a></li>
+      <li><a href="{{ url_for('auth.logout') }}" class="sidebar-link" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <main class="dashboard-content">
+    <div class="dashboard-header">
+      <div>
+        <h1>All Bookings Ledger</h1>
+        <p>Monitor reservation statuses, rental timelines, and host settlements.</p>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <a href="{{ url_for('admin.all_bookings', status='all') }}" class="filter-tab-btn {% if current_status == 'all' %}active{% endif %}">All ({{ bookings|length }})</a>
+      <a href="{{ url_for('admin.all_bookings', status='Pending') }}" class="filter-tab-btn {% if current_status == 'Pending' %}active{% endif %}">Pending</a>
+      <a href="{{ url_for('admin.all_bookings', status='Confirmed') }}" class="filter-tab-btn {% if current_status == 'Confirmed' %}active{% endif %}">Confirmed</a>
+      <a href="{{ url_for('admin.all_bookings', status='Completed') }}" class="filter-tab-btn {% if current_status == 'Completed' %}active{% endif %}">Completed</a>
+      <a href="{{ url_for('admin.all_bookings', status='Cancelled') }}" class="filter-tab-btn {% if current_status == 'Cancelled' %}active{% endif %}">Cancelled</a>
+    </div>
+
+    <div class="dashboard-card">
+      {% if bookings %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Booking Ref</th>
+                <th>Customer</th>
+                <th>Vehicle</th>
+                <th>Host</th>
+                <th>Dates & Duration</th>
+                <th>Total Fare</th>
+                <th>Status</th>
+                <th>Payment</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in bookings %}
+                <tr>
+                  <td><strong style="font-family: monospace;">{{ b.booking_reference }}</strong></td>
+                  <td>
+                    <div style="font-weight: 700;">{{ b.customer_name }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ b.customer_email }}</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 700;">{{ b.car_name }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ b.car_brand }}</div>
+                  </td>
+                  <td>{{ b.owner_name }}</td>
+                  <td>
+                    <div style="font-size: 0.85rem; font-weight: 700;">{{ b.start_date }} &rarr; {{ b.end_date }}</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">{{ b.total_days }} days</div>
+                  </td>
+                  <td><strong>{{ currency }}{{ "{:,.2f}".format(b.total_amount) }}</strong></td>
+                  <td><span class="role-tag {{ b.get_status_badge_class() }}">{{ b.booking_status }}</span></td>
+                  <td>
+                    {% if b.payment_status == 'Completed' %}
+                      <span class="role-tag badge-success"><i class="fa-solid fa-check"></i> Paid</span>
+                    {% else %}
+                      <span class="role-tag badge-warning">Unpaid</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: #6B7280; font-style: italic; padding: 2rem 0; text-align: center;">No bookings matching this status filter.</p>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

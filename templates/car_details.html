@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}{{ car.name }} - Self-Drive Car Rental | DriveEase{% endblock %}
+
+{% block content %}
+<div class="section" style="padding-top: 2rem;">
+  <!-- Breadcrumb -->
+  <div style="font-size: 0.85rem; color: #6B7280; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+    <a href="{{ url_for('public.index') }}">Home</a>
+    <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+    <a href="{{ url_for('public.cars') }}">Cars</a>
+    <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+    <span style="color: var(--text-primary); font-weight: 700;">{{ car.name }}</span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.35fr 0.85fr; gap: 2.5rem; align-items: flex-start;">
+    
+    <!-- Left Column: Car Showcase & Specs -->
+    <div>
+      <div style="position: relative; border-radius: var(--radius-lg); overflow: hidden; background: #0A0E17; box-shadow: var(--shadow-md); margin-bottom: 2rem;">
+        <img src="{{ car.image_url }}" alt="{{ car.name }}" style="width: 100%; max-height: 440px; object-fit: cover;" onerror="this.src='/static/images/default_car.jpg'">
+        <span class="car-badge-category {{ car.get_badge_class() }}" style="font-size: 0.85rem; top: 18px; left: 18px;">{{ car.category }}</span>
+        <span class="car-badge-location" style="font-size: 0.85rem; bottom: 18px; left: 18px;"><i class="fa-solid fa-location-dot" style="color: #EF4444;"></i> {{ car.location }}</span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+        <div>
+          <h1 style="font-size: 2.4rem; font-weight: 900; letter-spacing: -0.8px;">{{ car.name }}</h1>
+          <div style="font-size: 1rem; color: #6B7280; font-weight: 600; margin-top: 0.2rem;">
+            {{ car.brand }} &bull; {{ car.model }} &bull; {{ car.year }} Model &bull; Reg: <span style="font-family: monospace; font-weight: 700; color: var(--text-primary);">{{ car.registration_number }}</span>
+          </div>
+        </div>
+
+        <div style="background: #FEF3C7; color: #B45309; padding: 0.5rem 0.9rem; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.4rem; font-weight: 900; font-size: 1.1rem;">
+          <i class="fa-solid fa-star"></i> {{ car.avg_rating if car.avg_rating > 0 else '5.0' }}
+          <span style="font-size: 0.75rem; color: #92400E; font-weight: 600;">({{ car.total_reviews }} reviews)</span>
+        </div>
+      </div>
+
+      <!-- Key Specifications Grid -->
+      <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.75rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1.25rem;">Vehicle Specifications</h3>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="width: 42px; height: 42px; background: #F3F4F6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--primary-dark);"><i class="fa-solid fa-gear"></i></div>
+            <div>
+              <div style="font-size: 0.75rem; color: #6B7280; text-transform: uppercase;">Transmission</div>
+              <div style="font-weight: 800; font-size: 0.95rem;">{{ car.transmission }}</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="width: 42px; height: 42px; background: #F3F4F6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--primary-dark);"><i class="fa-solid fa-gas-pump"></i></div>
+            <div>
+              <div style="font-size: 0.75rem; color: #6B7280; text-transform: uppercase;">Fuel Type</div>
+              <div style="font-weight: 800; font-size: 0.95rem;">{{ car.fuel_type }}</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="width: 42px; height: 42px; background: #F3F4F6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--primary-dark);"><i class="fa-solid fa-users"></i></div>
+            <div>
+              <div style="font-size: 0.75rem; color: #6B7280; text-transform: uppercase;">Capacity</div>
+              <div style="font-weight: 800; font-size: 0.95rem;">{{ car.seating_capacity }} Persons</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="width: 42px; height: 42px; background: #F3F4F6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--primary-dark);"><i class="fa-solid fa-car-side"></i></div>
+            <div>
+              <div style="font-size: 0.75rem; color: #6B7280; text-transform: uppercase;">Category</div>
+              <div style="font-weight: 800; font-size: 0.95rem;">{{ car.category }}</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="width: 42px; height: 42px; background: #F3F4F6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--primary-dark);"><i class="fa-solid fa-calendar"></i></div>
+            <div>
+              <div style="font-size: 0.75rem; color: #6B7280; text-transform: uppercase;">Model Year</div>
+              <div style="font-weight: 800; font-size: 0.95rem;">{{ car.year }}</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="width: 42px; height: 42px; background: #F3F4F6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: #10B981;"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <div style="font-size: 0.75rem; color: #6B7280; text-transform: uppercase;">Sanitization</div>
+              <div style="font-weight: 800; font-size: 0.95rem;">Certified Clean</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description & Features -->
+      <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.75rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.8rem;">About This Vehicle</h3>
+        <p style="color: #4B5563; line-height: 1.7; font-size: 0.95rem;">
+          {{ car.description or "Well-maintained, smooth driving experience with complete service records. Inspected for safety, high highway stability, and comfort." }}
+        </p>
+
+        <h4 style="font-size: 1rem; font-weight: 800; margin-top: 1.5rem; margin-bottom: 0.8rem;">Included Features</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; font-size: 0.9rem; color: #374151;">
+          <div><i class="fa-solid fa-snowflake" style="color: #3B82F6; margin-right: 6px;"></i> Dual Zone Air Conditioning</div>
+          <div><i class="fa-solid fa-music" style="color: #8B5CF6; margin-right: 6px;"></i> Apple CarPlay & Android Auto</div>
+          <div><i class="fa-solid fa-shield" style="color: #10B981; margin-right: 6px;"></i> Dual Front Airbags & ABS</div>
+          <div><i class="fa-solid fa-road" style="color: #F59E0B; margin-right: 6px;"></i> 24/7 Roadside Assistance</div>
+          <div><i class="fa-solid fa-key" style="color: #EC4899; margin-right: 6px;"></i> Keyless Push Button Start</div>
+          <div><i class="fa-solid fa-map-location-dot" style="color: #06B6D4; margin-right: 6px;"></i> In-Built GPS Navigation</div>
+        </div>
+      </div>
+
+      <!-- Host Information Card -->
+      <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary-dark); color: var(--accent-yellow); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800;">
+            {{ car.owner_name[:1] if car.owner_name else 'H' }}
+          </div>
+          <div>
+            <div style="font-weight: 800; font-size: 1.05rem;">Hosted by {{ car.owner_name or 'Verified Partner' }}</div>
+            <div style="font-size: 0.82rem; color: #6B7280;">★ Verified Car Owner &bull; Contact: {{ car.owner_phone or 'Available on Booking' }}</div>
+          </div>
+        </div>
+        <span class="role-tag" style="background: #D1FAE5; color: #065F46; padding: 0.35rem 0.75rem;">
+          <i class="fa-solid fa-badge-check"></i> Superhost
+        </span>
+      </div>
+
+      <!-- Verified Reviews -->
+      <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.75rem; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="font-size: 1.2rem; font-weight: 800;">Verified Renter Reviews ({{ reviews|length }})</h3>
+        </div>
+
+        {% if reviews %}
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            {% for r in reviews %}
+              <div style="border-bottom: 1px solid #F3F4F6; padding-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                  <span style="font-weight: 800; font-size: 0.95rem;">{{ r.customer_name }}</span>
+                  <span style="color: #F59E0B; font-size: 0.95rem;">{{ "★" * r.rating + "☆" * (5 - r.rating) }}</span>
+                </div>
+                <p style="color: #4B5563; font-size: 0.9rem; line-height: 1.5;">{{ r.comment }}</p>
+                <div style="font-size: 0.75rem; color: #9CA3AF; margin-top: 0.3rem;">Reviewed on {{ r.created_at }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="color: #6B7280; font-size: 0.9rem; font-style: italic;">No reviews yet for this vehicle. Be the first to rent and rate!</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right Column: Interactive Uber/Rapido Fare Estimator & Instant Booking -->
+    <div style="background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-lg); position: sticky; top: 90px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-light);">
+        <div>
+          <span style="font-size: 2rem; font-weight: 900; color: var(--primary-dark);">{{ currency }}{{ "{:,.0f}".format(car.price_per_day) }}</span>
+          <span style="font-size: 0.85rem; color: #6B7280; font-weight: 600;">/ day</span>
+          <div style="font-size: 0.95rem; font-weight: 700; color: #D97706; margin-top: 0.2rem;">
+            +{{ currency }}{{ "{:,.0f}".format(car.price_per_km or 10.0) }}/km
+          </div>
+        </div>
+        <span class="role-tag" style="background: #FEF3C7; color: #B45309;">Best Rate Guarantee</span>
+      </div>
+
+      <input type="hidden" id="bookingCarId" value="{{ car.id }}">
+      <input type="hidden" id="carPricePerDay" value="{{ car.price_per_day }}">
+      <input type="hidden" id="carPricePerKm" value="{{ car.price_per_km or 10.0 }}">
+
+      <!-- Date Selection & Distance -->
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="form-group">
+          <label>Pickup Date</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-calendar-days icon"></i>
+            <input type="date" id="bookingStartDate" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Return Date</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-calendar-check icon"></i>
+            <input type="date" id="bookingEndDate" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Estimated Distance (km)</span>
+            <span style="font-size: 0.75rem; background: #FEF3C7; color: #92400E; padding: 2px 8px; border-radius: 99px; font-weight: 700;">
+              ₹{{ (car.price_per_km or 10.0) | int }}/km
+            </span>
+          </label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-gauge-high icon"></i>
+            <input type="number" id="estimatedKm" name="estimated_km" value="100" min="0" max="10000" step="10" class="form-control" placeholder="e.g. 150">
+          </div>
+          <div style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+            Pay for base rental + ₹{{ (car.price_per_km or 10.0) | int }}/km driven
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Availability Indicator -->
+      <div id="availabilityBadge" style="display: none; margin-bottom: 1.25rem;"></div>
+
+      <!-- Live Fare Calculation Breakdown Card -->
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
+        <div style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #6B7280; margin-bottom: 0.75rem;">Fare Estimation Breakdown</div>
+        
+        <div class="invoice-row">
+          <span>Duration</span>
+          <strong id="calcDays">1 Day</strong>
+        </div>
+        <div class="invoice-row">
+          <span>Base Rental</span>
+          <span id="calcBaseFare">{{ currency }}{{ "{:,.0f}".format(car.price_per_day) }}</span>
+        </div>
+        <div class="invoice-row" style="border-top: 1px dashed #E5E7EB; padding-top: 0.6rem; margin-top: 0.3rem;">
+          <span>
+            <i class="fa-solid fa-route" style="color: var(--accent-yellow); font-size: 0.8rem;"></i>
+            Est. Km Charges
+          </span>
+          <span id="calcKmCharges" style="color: #F59E0B; font-weight: 700;">{{ currency }}{{ "{:,.0f}".format((car.price_per_km or 10.0) * 100) }}</span>
+        </div>
+        <div class="invoice-row" style="font-size: 0.78rem; color: #9CA3AF; padding-top: 0; margin-top: -0.2rem;">
+          <span id="calcKmLabel">100 km × ₹{{ (car.price_per_km or 10.0) | int }}/km</span>
+          <span></span>
+        </div>
+        <div class="invoice-row" style="border-top: 1px dashed #E5E7EB; padding-top: 0.6rem; margin-top: 0.3rem;">
+          <span>Taxes & GST (5%)</span>
+          <span id="calcTaxes">{{ currency }}{{ "{:,.0f}".format((car.price_per_day + (car.price_per_km or 10.0) * 100) * 0.05) }}</span>
+        </div>
+        <div class="invoice-row" style="color: #059669;">
+          <span>Refundable Deposit</span>
+          <span>{{ currency }}2,000 (Demo 0%)</span>
+        </div>
+        <div class="invoice-row total" style="padding-top: 0.75rem; margin-top: 0.5rem;">
+          <span>Total Payable</span>
+          <span id="calcTotal" style="color: var(--primary-dark); font-size: 1.4rem;">{{ currency }}{{ "{:,.0f}".format((car.price_per_day + (car.price_per_km or 10.0) * 100) * 1.05) }}</span>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      {% if session.get('user_id') %}
+        <a id="btnSubmitBooking" href="{{ url_for('customer.book_car', car_id=car.id) }}" class="btn btn-accent btn-block" style="padding: 1rem; font-size: 1.05rem;">
+          <i class="fa-solid fa-bolt"></i> Proceed to Book Ride
+        </a>
+      {% else %}
+        <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-primary btn-block" style="padding: 1rem; font-size: 1.05rem;">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In to Book Ride
+        </a>
+      {% endif %}
+
+      <div style="margin-top: 1rem; text-align: center; font-size: 0.78rem; color: #6B7280;">
+        <i class="fa-solid fa-rotate-left"></i> Free cancellation up to 24 hours before pickup.
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
