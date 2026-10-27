@@ -1,0 +1,22 @@
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest & IDE
+.pytest_cache/
+.vscode/
+.idea/
+
+# Local Environment
+.env
+
+# OS metadata
+Thumbs.db
+.DS_Store
